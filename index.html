@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Timer Pro | AI Integrated</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="logo">RANDOM TIMER</h1>
+        <div id="monthBadge" class="badge">...</div>
+    </header>
+
+    <main class="timer-container">
+        <div class="clock-wrap">
+            <svg viewBox="0 0 100 100">
+                <circle class="track" cx="50" cy="50" r="44"/>
+                <circle id="progressRing" class="progress" cx="50" cy="50" r="44"/>
+            </svg>
+            <div class="time-display">
+                <div id="digits" class="digits">00:00:00</div>
+                <div class="label">REMAINING</div>
+            </div>
+        </div>
+
+        <div id="status" class="status-pill">IDLE</div>
+        <p id="chosenLabel" class="ai-info">&nbsp;</p>
+
+        <div class="controls">
+            <button id="startBtn" class="btn-primary">▶ START</button>
+            <button id="resetBtn" class="btn-secondary">↺ RESET</button>
+        </div>
+    </main>
+
+    <section class="history-container">
+        <h3>Session History</h3>
+        <table>
+            <thead><tr><th>Date</th><th>Timers</th><th>Daily Total</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+        </table>
+    </section>
+
+    <!-- Project logic bundled as a module -->
+    <script type="module" src="js/timer.js"></script>
+</body>
+</html>
