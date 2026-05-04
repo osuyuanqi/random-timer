@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ARCHITECTURE: Key injection placeholder for GitHub Actions
-const GEMINI_API_KEY = "AIzaSyBoXUqXwTpVODbZA2hORqimZNa_eNgueg0";
+const GEMINI_API_KEY = "AIzaSyBLGx6dSsSS698lcDLHyMUmKTORP5Ju9ts";
 
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB7iC9fWtvJMWpVZPIsC6EHcBWrWZ4UIec",
