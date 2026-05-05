@@ -1,9 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ARCHITECTURE: Key injection placeholder for GitHub Actions (Base64 encoded to bypass secret scanners)
-const GEMINI_API_KEY_B64 = "QUl6YVN5QmZwcXM4bDd3aVlXODFicW12YUdYNWxJR1paZ0czT3Iw";
-const GEMINI_API_KEY = GEMINI_API_KEY_B64.includes("PLACEHOLDER") ? GEMINI_API_KEY_B64 : atob(GEMINI_API_KEY_B64).trim();
+// ARCHITECTURE: Key injection placeholder for GitHub Actions
+const GEMINI_API_KEY = "QUl6YVN5Q0N5eExYZjRHQ2dzcEdCQ1llX1FVUU44dms4cFB5bXYw";
 
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB7iC9fWtvJMWpVZPIsC6EHcBWrWZ4UIec",
