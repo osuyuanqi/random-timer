@@ -48,8 +48,22 @@
         </table>
         <div style="margin-top: 20px; text-align: center;">
             <button id="testBtn" style="background: #444; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-right: 10px;">⏱ 10s Test</button>
-            <button id="clearBtn" style="background: #8a2be2; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">🗑 Clear History</button>
+            <button id="clearBtn" style="background: #8a2be2; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">🗑 Clear Test History</button>
         </div>
+
+        <details style="margin-top: 20px;">
+            <summary style="cursor: pointer; color: #adbac7; font-size: 0.9rem;">Show Test History</summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; opacity: 0.7;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Date</th>
+                        <th>T1</th><th>T2</th><th>T3</th><th>T4</th>
+                        <th>Daily Total</th>
+                    </tr>
+                </thead>
+                <tbody id="testHistoryBody"></tbody>
+            </table>
+        </details>
     </section>
 
     <!-- Project logic bundled as a module -->
