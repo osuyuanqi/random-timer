@@ -51,29 +51,34 @@ async function getSeconds() {
 
 // 3. UI State
 let totalSec = 0, remaining = 0, running = false, timerInterval = null, isTestMode = false;
+let isRinging = false;
+let activeOscillator = null;
 
-const playBeep = () => {
+const startBeepLoop = () => {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        osc.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.3);
+        activeOscillator = ctx.createOscillator();
+        activeOscillator.type = 'sine';
+        activeOscillator.frequency.setValueAtTime(880, ctx.currentTime);
+        activeOscillator.connect(ctx.destination);
+        activeOscillator.start();
     } catch (e) { console.log("Audio not supported", e); }
+};
+
+const stopBeepLoop = () => {
+    if (activeOscillator) {
+        try { activeOscillator.stop(); } catch(e){}
+        activeOscillator = null;
+    }
 };
 
 const tick = () => {
     if (remaining <= 0) {
         clearInterval(timerInterval);
-        playBeep();
+        startBeepLoop();
+        isRinging = true;
         document.getElementById('status').innerText = "DONE";
-        document.getElementById('startBtn').innerText = '▶ NEW';
-        if (totalSec > 0) {
-            saveToDB(totalSec, isTestMode);
-            totalSec = 0;
-        }
+        document.getElementById('startBtn').innerText = '🛑 STOP';
         return;
     }
     remaining--;
@@ -82,6 +87,17 @@ const tick = () => {
 };
 
 window.handleStart = async () => {
+    if (isRinging) {
+        stopBeepLoop();
+        isRinging = false;
+        document.getElementById('startBtn').innerText = '▶ START';
+        document.getElementById('status').innerText = 'IDLE';
+        if (totalSec > 0) {
+            saveToDB(totalSec, isTestMode);
+            totalSec = 0;
+        }
+        return;
+    }
     isTestMode = false;
     if (running) {
         clearInterval(timerInterval);
@@ -116,7 +132,7 @@ document.getElementById('monthBadge').innerText = `LIMIT: ${calcMax()} MIN`;
 document.getElementById('startBtn').onclick = window.handleStart;
 document.getElementById('resetBtn').onclick = () => location.reload();
 document.getElementById('testBtn').onclick = () => {
-    if (running) return;
+    if (running || isRinging) return;
     isTestMode = true;
     totalSec = 10; remaining = 10; running = true;
     document.getElementById('startBtn').innerText = '⏸ PAUSE';
