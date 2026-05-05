@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, enableIndexedDbPersistence, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ARCHITECTURE: Key injection placeholder for GitHub Actions (Base64 encoded to bypass secret scanners)
 const GEMINI_API_KEY_B64 = "__GEMINI_API_KEY_PLACEHOLDER__";
@@ -57,6 +57,10 @@ const tick = () => {
         clearInterval(timerInterval);
         document.getElementById('status').innerText = "DONE";
         document.getElementById('startBtn').innerText = '▶ NEW';
+        if (totalSec > 0) {
+            saveToDB(totalSec);
+            totalSec = 0;
+        }
         return;
     }
     remaining--;
@@ -74,7 +78,6 @@ window.handleStart = async () => {
     if (remaining <= 0) {
         totalSec = await getSeconds();
         remaining = totalSec;
-        saveToDB(totalSec);
     }
     running = true;
     document.getElementById('startBtn').innerText = '⏸ PAUSE';
@@ -96,10 +99,47 @@ const saveToDB = async (s) => {
 document.getElementById('monthBadge').innerText = `LIMIT: ${calcMax()} MIN`;
 document.getElementById('startBtn').onclick = window.handleStart;
 document.getElementById('resetBtn').onclick = () => location.reload();
+document.getElementById('testBtn').onclick = () => {
+    if (running) return;
+    totalSec = 10; remaining = 10; running = true;
+    document.getElementById('startBtn').innerText = '⏸ PAUSE';
+    document.getElementById('status').innerText = 'TEST MODE';
+    timerInterval = setInterval(tick, 1000);
+};
+document.getElementById('clearBtn').onclick = async () => {
+    if (!confirm("Are you sure you want to clear all history?")) return;
+    const snap = await getDocs(collection(db, "sessions"));
+    snap.forEach(d => deleteDoc(doc(db, "sessions", d.id)));
+};
 
 onSnapshot(query(collection(db, "sessions"), orderBy("date", "desc")), (snap) => {
-    document.getElementById('historyBody').innerHTML = snap.docs.map(d => {
+    const months = {};
+    snap.docs.forEach(d => {
         const r = d.data();
-        return `<tr><td>${r.date}</td><td>${r.timers.join(', ')}m</td><td><b>${r.total}m</b></td></tr>`;
-    }).join('');
+        const monthKey = r.date.substring(0, 7);
+        if (!months[monthKey]) months[monthKey] = { total: 0, rows: [] };
+        months[monthKey].total += r.total;
+        
+        let t1 = r.timers[0] || '-';
+        let t2 = r.timers[1] || '-';
+        let t3 = r.timers[2] || '-';
+        let t4 = r.timers[3] || '-';
+        if (r.timers.length > 4) t4 = r.timers.slice(3).join(', ');
+        
+        months[monthKey].rows.push(`<tr>
+            <td>${r.date}</td>
+            <td>${t1}${t1!=='-'?'m':''}</td>
+            <td>${t2}${t2!=='-'?'m':''}</td>
+            <td>${t3}${t3!=='-'?'m':''}</td>
+            <td>${t4}${t4!=='-'?'m':''}</td>
+            <td><b>${r.total}m</b></td>
+        </tr>`);
+    });
+
+    let html = '';
+    for (const [month, data] of Object.entries(months)) {
+        html += `<tr style="background:#2d333b;"><td colspan="5" style="color:#adbac7; text-align:left; padding-left:10px;">📅 ${month}</td><td><b style="color:#539bf5;">${data.total}m</b></td></tr>`;
+        html += data.rows.join('');
+    }
+    document.getElementById('historyBody').innerHTML = html;
 });

@@ -36,10 +36,20 @@
 
     <section class="history-container">
         <h3>Session History</h3>
-        <table>
-            <thead><tr><th>Date</th><th>Timers</th><th>Daily Total</th></tr></thead>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;">Date</th>
+                    <th>T1</th><th>T2</th><th>T3</th><th>T4</th>
+                    <th>Daily Total</th>
+                </tr>
+            </thead>
             <tbody id="historyBody"></tbody>
         </table>
+        <div style="margin-top: 20px; text-align: center;">
+            <button id="testBtn" style="background: #444; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-right: 10px;">⏱ 10s Test</button>
+            <button id="clearBtn" style="background: #8a2be2; color: #fff; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">🗑 Clear History</button>
+        </div>
     </section>
 
     <!-- Project logic bundled as a module -->
