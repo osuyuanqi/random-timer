@@ -3,7 +3,7 @@ import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapsh
 
 // ARCHITECTURE: Key injection placeholder for GitHub Actions (Base64 encoded to bypass secret scanners)
 const GEMINI_API_KEY_B64 = "QUl6YVN5QmZwcXM4bDd3aVlXODFicW12YUdYNWxJR1paZ0czT3Iw";
-const GEMINI_API_KEY = GEMINI_API_KEY_B64.includes("PLACEHOLDER") ? GEMINI_API_KEY_B64 : atob(GEMINI_API_KEY_B64);
+const GEMINI_API_KEY = GEMINI_API_KEY_B64.includes("PLACEHOLDER") ? GEMINI_API_KEY_B64 : atob(GEMINI_API_KEY_B64).trim();
 
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB7iC9fWtvJMWpVZPIsC6EHcBWrWZ4UIec",
