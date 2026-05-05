@@ -50,15 +50,28 @@ async function getSeconds() {
 }
 
 // 3. UI State
-let totalSec = 0, remaining = 0, running = false, timerInterval = null;
+let totalSec = 0, remaining = 0, running = false, timerInterval = null, isTestMode = false;
+
+const playBeep = () => {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch (e) { console.log("Audio not supported", e); }
+};
 
 const tick = () => {
     if (remaining <= 0) {
         clearInterval(timerInterval);
+        playBeep();
         document.getElementById('status').innerText = "DONE";
         document.getElementById('startBtn').innerText = '▶ NEW';
         if (totalSec > 0) {
-            saveToDB(totalSec);
+            saveToDB(totalSec, isTestMode);
             totalSec = 0;
         }
         return;
@@ -69,6 +82,7 @@ const tick = () => {
 };
 
 window.handleStart = async () => {
+    isTestMode = false;
     if (running) {
         clearInterval(timerInterval);
         running = false;
@@ -85,11 +99,12 @@ window.handleStart = async () => {
     timerInterval = setInterval(tick, 1000);
 };
 
-const saveToDB = async (s) => {
+const saveToDB = async (s, testMode) => {
     const now = new Date();
     const key = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0');
-    const ref = doc(db, "sessions", key);
-    const m = Math.ceil(s/60);
+    const collName = testMode ? "test_sessions" : "sessions";
+    const ref = doc(db, collName, key);
+    const m = testMode ? s : Math.ceil(s/60);
     const snap = await getDoc(ref);
     const timers = snap.exists() ? (snap.data().timers || []) : [];
     timers.push(m);
@@ -102,18 +117,19 @@ document.getElementById('startBtn').onclick = window.handleStart;
 document.getElementById('resetBtn').onclick = () => location.reload();
 document.getElementById('testBtn').onclick = () => {
     if (running) return;
-    totalSec = 600; remaining = 10; running = true;
+    isTestMode = true;
+    totalSec = 10; remaining = 10; running = true;
     document.getElementById('startBtn').innerText = '⏸ PAUSE';
     document.getElementById('status').innerText = 'TEST MODE';
     timerInterval = setInterval(tick, 1000);
 };
 document.getElementById('clearBtn').onclick = async () => {
-    if (!confirm("Are you sure you want to clear all history?")) return;
-    const snap = await getDocs(collection(db, "sessions"));
-    snap.forEach(d => deleteDoc(doc(db, "sessions", d.id)));
+    if (!confirm("Are you sure you want to clear the test history?")) return;
+    const snap = await getDocs(collection(db, "test_sessions"));
+    snap.forEach(d => deleteDoc(doc(db, "test_sessions", d.id)));
 };
 
-onSnapshot(query(collection(db, "sessions"), orderBy("date", "desc")), (snap) => {
+const renderTable = (snap, elementId, unit) => {
     const months = {};
     snap.docs.forEach(d => {
         const r = d.data();
@@ -129,18 +145,21 @@ onSnapshot(query(collection(db, "sessions"), orderBy("date", "desc")), (snap) =>
         
         months[monthKey].rows.push(`<tr>
             <td>${r.date}</td>
-            <td>${t1}${t1!=='-'?'m':''}</td>
-            <td>${t2}${t2!=='-'?'m':''}</td>
-            <td>${t3}${t3!=='-'?'m':''}</td>
-            <td>${t4}${t4!=='-'?'m':''}</td>
-            <td><b>${r.total}m</b></td>
+            <td>${t1}${t1!=='-'?unit:''}</td>
+            <td>${t2}${t2!=='-'?unit:''}</td>
+            <td>${t3}${t3!=='-'?unit:''}</td>
+            <td>${t4}${t4!=='-'?unit:''}</td>
+            <td><b>${r.total}${unit}</b></td>
         </tr>`);
     });
 
     let html = '';
     for (const [month, data] of Object.entries(months)) {
-        html += `<tr style="background:#2d333b;"><td colspan="5" style="color:#adbac7; text-align:left; padding-left:10px;">📅 ${month}</td><td><b style="color:#539bf5;">${data.total}m</b></td></tr>`;
+        html += `<tr style="background:#2d333b;"><td colspan="5" style="color:#adbac7; text-align:left; padding-left:10px;">📅 ${month}</td><td><b style="color:#539bf5;">${data.total}${unit}</b></td></tr>`;
         html += data.rows.join('');
     }
-    document.getElementById('historyBody').innerHTML = html;
-});
+    document.getElementById(elementId).innerHTML = html;
+};
+
+onSnapshot(query(collection(db, "sessions"), orderBy("date", "desc")), (snap) => renderTable(snap, 'historyBody', 'm'));
+onSnapshot(query(collection(db, "test_sessions"), orderBy("date", "desc")), (snap) => renderTable(snap, 'testHistoryBody', 's'));
