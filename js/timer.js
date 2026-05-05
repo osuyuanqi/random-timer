@@ -21,6 +21,7 @@ enableIndexedDbPersistence(db).catch(() => console.warn("Offline sync active."))
 
 // 2. Logic Helpers
 const calcMax = () => 90 + Math.max(0, ((new Date().getFullYear() - 2026) * 12 + (new Date().getMonth() + 1 - 5))) * 30;
+const formatTimeStr = (secs) => new Date(secs * 1000).toISOString().substr(11, 8);
 
 async function getSeconds() {
     const maxSecs = calcMax() * 60;
@@ -38,43 +39,49 @@ async function getSeconds() {
             const data = await resp.json();
             const val = parseInt(data.candidates[0].content.parts[0].text.trim());
             if (!isNaN(val)) {
-                document.getElementById('chosenLabel').innerHTML = `AI ROLLED: <b>${val}s</b>`;
+                document.getElementById('chosenLabel').innerHTML = `AI ROLLED: <b>${formatTimeStr(val)}</b>`;
                 return val;
             }
         } catch (e) { console.error("AI Fallback triggered"); }
     }
     
     const local = Math.floor(Math.random() * maxSecs) + 1;
-    document.getElementById('chosenLabel').innerHTML = `LOCAL ROLL: <b>${local}s</b>`;
+    document.getElementById('chosenLabel').innerHTML = `LOCAL ROLL: <b>${formatTimeStr(local)}</b>`;
     return local;
 }
 
 // 3. UI State
 let totalSec = 0, remaining = 0, running = false, timerInterval = null, isTestMode = false;
 let isRinging = false;
-let activeOscillator = null;
+let beepInterval = null;
+let audioCtx = null;
+
+const playBeep = () => {
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+    } catch (e) { }
+};
 
 const startBeepLoop = () => {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        activeOscillator = ctx.createOscillator();
-        activeOscillator.type = 'sine';
-        activeOscillator.frequency.setValueAtTime(880, ctx.currentTime);
-        activeOscillator.connect(ctx.destination);
-        activeOscillator.start();
-    } catch (e) { console.log("Audio not supported", e); }
+    playBeep();
+    beepInterval = setInterval(playBeep, 800);
 };
 
 const stopBeepLoop = () => {
-    if (activeOscillator) {
-        try { activeOscillator.stop(); } catch(e){}
-        activeOscillator = null;
-    }
+    if (beepInterval) clearInterval(beepInterval);
+    beepInterval = null;
 };
 
 const tick = () => {
     if (remaining <= 0) {
         clearInterval(timerInterval);
+        running = false;
         startBeepLoop();
         isRinging = true;
         document.getElementById('status').innerText = "DONE";
