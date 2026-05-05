@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Timer Pro | AI Integrated</title>
+    <title>Gemini Blind Timer</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@800&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1 class="logo">RANDOM TIMER</h1>
+        <h1 class="logo">GEMINI BLIND TIMER</h1>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+            <span style="background: #2d333b; color: #58a6ff; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444c56;">🧠 Gemini 2.5 AI</span>
+            <span style="background: #2d333b; color: #3fb950; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444c56;">🐍 Pytest CI/CD</span>
+            <span style="background: #2d333b; color: #f2cc60; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #444c56;">🔥 Serverless Firebase</span>
+        </div>
         <div id="monthBadge" class="badge">...</div>
     </header>
 
@@ -64,6 +70,16 @@
                 <tbody id="testHistoryBody"></tbody>
             </table>
         </details>
+    </section>
+
+    <section class="architecture-container" style="max-width: 600px; margin: 40px auto 20px auto; background: #1c2128; padding: 20px; border-radius: 8px; border: 1px solid #444c56; text-align: left;">
+        <h3 style="color: #adbac7; margin-top: 0; border-bottom: 1px solid #444c56; padding-bottom: 10px;">System Architecture</h3>
+        <ul style="color: #768390; font-size: 0.9rem; line-height: 1.5; padding-left: 20px;">
+            <li><b>AI Integration:</b> Connects to Gemini 2.5 Flash via REST to securely generate unpredictable study intervals.</li>
+            <li><b>Secret Management:</b> API keys are completely stripped from source code. GitHub Actions injects a Base64-encoded key during the CI/CD build step to bypass public repository secret scanning.</li>
+            <li><b>Data Persistence:</b> Fully serverless data layer using Firebase Firestore to synchronize session arrays mathematically grouped by month.</li>
+            <li><b>Continuous Testing:</b> The Python `pytest` suite strictly validates time-horizon boundaries and aggregation logic. Deployments to GitHub Pages are instantly aborted if any tests fail in the CI/CD pipeline.</li>
+        </ul>
     </section>
 
     <!-- Project logic bundled as a module -->
