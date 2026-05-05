@@ -62,15 +62,22 @@ const playBeep = () => {
         const osc = audioCtx.createOscillator();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.connect(audioCtx.destination);
+        
+        // Prevent audio clicking with a tiny fade out
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.2);
+        osc.stop(audioCtx.currentTime + 0.3);
     } catch (e) { }
 };
 
 const startBeepLoop = () => {
     playBeep();
-    beepInterval = setInterval(playBeep, 800);
+    beepInterval = setInterval(playBeep, 1000);
 };
 
 const stopBeepLoop = () => {
