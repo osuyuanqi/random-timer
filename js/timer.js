@@ -86,7 +86,8 @@ window.handleStart = async () => {
 };
 
 const saveToDB = async (s) => {
-    const key = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const key = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0');
     const ref = doc(db, "sessions", key);
     const m = Math.ceil(s/60);
     const snap = await getDoc(ref);
@@ -101,7 +102,7 @@ document.getElementById('startBtn').onclick = window.handleStart;
 document.getElementById('resetBtn').onclick = () => location.reload();
 document.getElementById('testBtn').onclick = () => {
     if (running) return;
-    totalSec = 10; remaining = 10; running = true;
+    totalSec = 600; remaining = 10; running = true;
     document.getElementById('startBtn').innerText = '⏸ PAUSE';
     document.getElementById('status').innerText = 'TEST MODE';
     timerInterval = setInterval(tick, 1000);
