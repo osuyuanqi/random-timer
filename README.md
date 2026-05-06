@@ -61,5 +61,13 @@ Designed with a "Focus-First" aesthetic:
 
 ---
 
+## 🔮 Future Roadmap
+Even as a completed MVP, there are clear paths for architectural scaling:
+- **High-Precision Analytics:** Transition the database schema from rounded minutes to raw Unix timestamps/total seconds to provide millisecond-accurate study reporting.
+- **AI-Driven Coaching:** Utilize Gemini's long-context window to analyze study patterns over months and provide personalized focus coaching.
+- **Native Notifications:** Integrate Web Push API to provide focus reminders even when the browser tab is backgrounded.
+
+---
+
 ## 📄 License
 This project is open-source under the [MIT License](LICENSE).
